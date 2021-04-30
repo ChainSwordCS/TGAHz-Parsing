@@ -8,6 +8,26 @@ So, older builds (February 2018) can stream in a TARGA image format. The capabil
 
 The TARGA image format streamed by HzMod is non-standard, so this repository is to document our reverse engineering efforts. Eventually we plan to push some changes to Snickerstream to add support to TARGA streams: https://github.com/RattletraPM/Snickerstream
 
+# Running the Script
+
+This script is written in Python 3. It requires the 'pillow' module.
+
+This is not a generic TARGA reader. It is only designed to interpret HzMod TGAs, so certain header information is hard-coded as it is constant for HzMod.
+
+There are several available command-line arguments:
+
+* `-log`: Log each packet and some metadata to the console
+* `-logcolor`: Color-code log output as RGB, with purple for the attribute bit
+* `-noimage`: Don't output an image
+* `-txt`: Take input from a text file containing a hex string on the first line
+* `-txtanim`: Create an animated image with input from a text file containing a hex string on each line
+* `-tga` or `-bin`: Take input from a binary file
+* `-hex`: Take input from a hex string
+
+All input, raw or as a file, is at the end of the command. For example, `python TGAHzParse.py -txt -log input.txt` takes input as a hex string in input.txt.
+
+Output images are saved as TGAHZ.png for single frames or TGAHZ.gif for animations.
+
 # Key
 
 * R = This bit is part of the Red
@@ -17,7 +37,7 @@ The TARGA image format streamed by HzMod is non-standard, so this repository is 
 
 # Image Parsing Results
 
-## Commit [139fa601fc96389fba8d3332ca6f058a16d84994](https://github.com/Eiim/TGAHz-Parsing/commit/139fa601fc96389fba8d3332ca6f058a16d84994)
+## Commit [139fa60](https://github.com/Eiim/TGAHz-Parsing/commit/139fa601fc96389fba8d3332ca6f058a16d84994)
 
 https://cdn.discordapp.com/attachments/836413155894100050/837059467703091210/TGAHZ.png
 
@@ -25,7 +45,7 @@ Bit order: ARRRRRGG GGGBBBBB
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837059467703091210/TGAHZ.png)
 
-## Commit [387e2164f31f00570f211fb9b1e1fff9c635d218](https://github.com/Eiim/TGAHz-Parsing/commit/387e2164f31f00570f211fb9b1e1fff9c635d218)
+## Commit [387e216](https://github.com/Eiim/TGAHz-Parsing/commit/387e2164f31f00570f211fb9b1e1fff9c635d218)
 
 https://cdn.discordapp.com/attachments/836413155894100050/837069486389198848/RRRRRRGG_GGGBBBBB.png
 
@@ -45,19 +65,19 @@ Bit order: RRRRRGGG GGBBBBBA
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837069483596185620/RRRRRGGG_GGBBBBBA.png)
 
-## Commit [4c910bf2f3f5fc08fdeacda75d5cde884d9f5a98](https://github.com/Eiim/TGAHz-Parsing/commit/4c910bf2f3f5fc08fdeacda75d5cde884d9f5a98)
+## Commit [4c910bf](https://github.com/Eiim/TGAHz-Parsing/commit/4c910bf2f3f5fc08fdeacda75d5cde884d9f5a98)
 
 https://cdn.discordapp.com/attachments/836413155894100050/837097268192346142/TGAHZ.png
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837097268192346142/TGAHZ.png)
 
-## Commit [60452bcff908b58125ce49026add7b1556cd39ae](https://github.com/Eiim/TGAHz-Parsing/commit/60452bcff908b58125ce49026add7b1556cd39ae)
+## Commit [60452bc](https://github.com/Eiim/TGAHz-Parsing/commit/60452bcff908b58125ce49026add7b1556cd39ae)
 
 https://cdn.discordapp.com/attachments/836413155894100050/837153929284157491/TGAHZ.png
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837153929284157491/TGAHZ.png)
 
-## Commit []()
+## Commit [39ac5f4](https://github.com/Eiim/TGAHz-Parsing/commit/39ac5f437bed6ea7bf5bab137a8edd4fc5924a01)
 
 Fixed a bug in the byte-grabbing code which was causing weird errors at every RAW packet. This was the only bug remaining in the past two revisions.
 
@@ -66,9 +86,3 @@ Also, colors are pretty darn accurate.
 https://cdn.discordapp.com/attachments/836413155894100050/837196767270666310/TGAHZ.png
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837196767270666310/TGAHZ.png)
-
-# Running the Script
-
-Right now, the TGA image file and header information are hard-coded into the Python script.
-
-This script is written in Python 3. It requires the 'pillow' module.
