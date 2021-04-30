@@ -94,11 +94,11 @@ def processframe(data):
 			header = data[i] # Top byte indicates RLE/RAW
 			
 			if(header > 127):
-				if(log or loghex):
+				if(log):
 					print("RLE",end='')
 				rle = True
 			else:
-				if(log or loghex):
+				if(log):
 					print("RAW",end='')
 				rle = False
 			
@@ -107,7 +107,7 @@ def processframe(data):
 			i = i + 1; # Skip header byte
 			
 			# Print number of pixels :)
-			if(log or loghex):
+			if(log):
 				print(str(packlen).rjust(4)+" ",end='')
 			
 			# Now... the hard part :(
