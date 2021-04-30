@@ -18,12 +18,21 @@ def printrgb(rgb):
 	else:
 		print(rgb+"  ", end='')
 		
-def printrgb24(rgb): # The Epic Sequel
+def printrgb24(rgb): # The Sequel
     if(color):
         # Print formatted color as RRRRRRRR GGGGGGGG BBBBBBBB
         print(f"{colors.RED}"+rgb[0:8]+f"{colors.GREEN}"+rgb[8:17]+f"{colors.BLUE}"+rgb[17:]+f"{colors.ENDC}  ", end='')
     else:
         print(rgb+"  ", end='')
+		
+def printrgb24hex(rgb): # The Squeakquel
+    if(color):
+        # Print formatted color as RRGGBB
+        print(f"{colors.RED}"+rgb[0:2]+f"{colors.GREEN}"+rgb[2:4]+f"{colors.BLUE}"+rgb[4:]+f"{colors.ENDC}  ", end='')
+    else:
+        print(rgb+"  ", end='')
+
+
 
 def torgb(b2, b1):
 #	RRRRRGGG GGBBBBBA
@@ -48,6 +57,8 @@ color = ("-logcolor" in sys.argv)
 animated = False
 # force interpretation as a 24-bit encoded Targa (experimental)
 bit24 = ("-bit24" in sys.argv)
+# ability to log colors in 24-bit hex values instead of binary. only compatible with 24-bit color decoding for now
+loghex = ("-loghex" in sys.argv)
 
 # Input data
 if ("-txt" in sys.argv):
@@ -83,11 +94,11 @@ def processframe(data):
 			header = data[i] # Top byte indicates RLE/RAW
 			
 			if(header > 127):
-				if(log):
+				if(log or loghex):
 					print("RLE",end='')
 				rle = True
 			else:
-				if(log):
+				if(log or loghex):
 					print("RAW",end='')
 				rle = False
 			
@@ -96,7 +107,7 @@ def processframe(data):
 			i = i + 1; # Skip header byte
 			
 			# Print number of pixels :)
-			if(log):
+			if(log or loghex):
 				print(str(packlen).rjust(4)+" ",end='')
 			
 			# Now... the hard part :(
@@ -108,7 +119,10 @@ def processframe(data):
 				b3 = data[i+2]
 				
 				if(log):
-					printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
+					if(loghex):
+						printrgb24hex(format(b1, '02x')+format(b2, '02x')+format(b3, '02x'))
+					else:
+						printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
 				
 				if(image):
 					# Note: No need to convert to 24-bit... This is already 24-bit hopefully
@@ -131,7 +145,12 @@ def processframe(data):
 					b3 = data[i+j*3+2] # Cam says this might break idk what I'm doing half the time
 					
 					if(log):
-						printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
+						if(loghex):
+							printrgb24hex(format(b1, '02x')+format(b2, '02x')+format(b3, '02x'))
+						else:
+							printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
+						
+						
 					if(image):
 						# repeat again
 						

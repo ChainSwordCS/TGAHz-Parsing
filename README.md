@@ -18,11 +18,15 @@ There are several available command-line arguments:
 
 * `-log`: Log each packet and some metadata to the console
 * `-logcolor`: Color-code log output as RGB, with purple for the attribute bit
+* `-loghex`: Log each packet, but in 24-bit hex color values rather than binary (Only compatible with 24-bit color decoding)
+
 * `-noimage`: Don't output an image
+
 * `-txt`: Take input from a text file containing a hex string on the first line
 * `-txtanim`: Create an animated image with input from a text file containing a hex string on each line
 * `-tga` or `-bin`: Take input from a binary file
 * `-hex`: Take input from a hex string
+
 * `-bit24`: Force experimental 24-bit color decoding (16-bit is the default)
 
 All input, raw or as a file, is at the end of the command. For example, `python TGAHzParse.py -txt -log input.txt` takes input as a hex string in input.txt.
