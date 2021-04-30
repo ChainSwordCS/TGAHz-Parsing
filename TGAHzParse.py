@@ -109,6 +109,9 @@ def processframe(data):
 			# Print number of pixels :)
 			if(log):
 				print(str(packlen).rjust(4)+" ",end='')
+				# Log bits of the "Header" byte just in case.
+				print("  ", end='')
+				print((format(data[i-1], '08b'))+"   ",end='')
 			
 			# Now... the hard part :(
 			
