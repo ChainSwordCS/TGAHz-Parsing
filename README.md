@@ -23,6 +23,7 @@ There are several available command-line arguments:
 * `-txtanim`: Create an animated image with input from a text file containing a hex string on each line
 * `-tga` or `-bin`: Take input from a binary file
 * `-hex`: Take input from a hex string
+* `-bit24`: Force experimental 24-bit color decoding (16-bit is the default)
 
 All input, raw or as a file, is at the end of the command. For example, `python TGAHzParse.py -txt -log input.txt` takes input as a hex string in input.txt.
 
@@ -86,3 +87,13 @@ Also, colors are pretty darn accurate.
 https://cdn.discordapp.com/attachments/836413155894100050/837196767270666310/TGAHZ.png
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837196767270666310/TGAHZ.png)
+
+# 24-Bit Image Parsing Results
+
+## Commit [625e0ff](https://github.com/ChainSwordCS/TGAHz-Parsing/commit/625e0fff53aff33e961fd9c828136614449d4522)
+
+Preliminary support. Totally broken. With 16-bit we had a jump start, but here we kinda don't.
+
+https://cdn.discordapp.com/attachments/836413155894100050/837536941326729246/TGAHZ.png
+
+![](https://cdn.discordapp.com/attachments/836413155894100050/837536941326729246/TGAHZ.png)
