@@ -82,7 +82,7 @@ else:
 def processframe(data):
 	if(bit24): # Time for experimental 24-bit image support baby!!!
 		# Note: Don't skip any bytes (for now)
-		i = 0
+		i = 22
 		# Pixel Number. This is important for the initial-prototyping stage, because 24-bit TGAHZ files don't have the same footer as 16-bit TGAHZ files,
 		# so we don't actually know where to stop rendering unless we count the pixels manually. This is error-checking.
 		pxnum = 0
@@ -180,13 +180,15 @@ def processframe(data):
 		data = data[:-26]
 		# Skip first 22 bytes
 		i = 22
+		# Pixel Number
+		pxnum = 0
 
 		# Implied header: 16010A000001002000000000F0009001102000000000
 
 		if(image):
 			imgdat = bytearray(b'')
 
-		while(i < len(data)):
+		while(i < len(data) and pxnum < 96000): #Will abruptly end after the final pixel :)
 			header = data[i]
 			# Top byte indicates RLE/RAW
 			if(header > 127):
@@ -199,6 +201,7 @@ def processframe(data):
 				rle = False
 			# Length of packet, pixels for RLE or colors for RAW
 			packlen = header % 128 + 1
+			pxnum = pxnum + packlen # Increment the pixel number
 			# Skip header byte
 			i = i + 1;
 			
