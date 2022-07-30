@@ -84,7 +84,9 @@ else:
 
 def processframe(data):
 
-	try: # catch error if we reach end of data
+	endoffile = False # Please don't remove or adjust this unless you KNOW it works. Throwing an exception instead of this may break things massively.
+
+	try: # better catch errors at end of data. obsoleted this -> endoffile = False
 		if(bit24): # Time for experimental 24-bit image support baby!!!
 			# Note: Don't skip any bytes (for now)
 			i = 22
@@ -107,8 +109,8 @@ def processframe(data):
 						print("RAW",end='')
 					rle = False
 				
-				packlen = header % 128 + 1 # Length of packet, pixels for RLE or colors for RAW
-				#pxnum = pxnum + packlen # Increment the pixel number by however long the stupid packet says it is
+				packlen = header % 128 + 1 # Length of packet; number of pixels to fill in RLE-context, or number of colors to draw sequentially in RAW-context.(?)
+				#pxnum = pxnum + packlen # Increment the pixel number by however long the stupid packet says it is (dummied out why?)
 				i = i + 1; # Skip header byte
 				
 				# Print number of pixels :)
@@ -132,16 +134,16 @@ def processframe(data):
 							printrgb24hex(format(b1, '02x')+format(b2, '02x')+format(b3, '02x'))
 						else:
 							printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
-					
+						
 					if(image):
 						# Note: No need to convert to 24-bit... This is already 24-bit hopefully
 						
 						for j in range(packlen): # Eiim says J is a dummy variable. I think he's a dummy
-												 # Note to self: I'm a dummy lmfao. This is a different J, the letter was just chosen by personal preference.
+							# Note to self: I'm a dummy lmfao. This is a different J, the letter was just chosen by personal preference.
 							imgdat.append(b1)
 							imgdat.append(b2)
 							imgdat.append(b3)
-					
+						
 					# Skip past three color bytes
 					i = i + 3
 					
@@ -158,10 +160,9 @@ def processframe(data):
 								printrgb24hex(format(b1, '02x')+format(b2, '02x')+format(b3, '02x'))
 							else:
 								printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
-							
+						
 						if(image):
 							# repeat again
-							
 							imgdat.append(b1)
 							imgdat.append(b2)
 							imgdat.append(b3)
@@ -174,8 +175,6 @@ def processframe(data):
 					# Need newline after all those colors
 					print()
 
-
-
 		# 16-bit TGAHZ (THIS IS THE DEFAULT!!!)
 		else:
 			# Skip last 26 bytes (footer)
@@ -184,12 +183,12 @@ def processframe(data):
 			i = 22
 			# Pixel Number
 			pxnum = 0
-
+			
 			# Implied header: 16010A000001002000000000F0009001102000000000
-
+			
 			if(image):
 				imgdat = bytearray(b'')
-
+			
 			while(i < len(data) and pxnum < 96000): #Will abruptly end after the final pixel :)
 				header = data[i]
 				# Top byte indicates RLE/RAW
@@ -209,27 +208,30 @@ def processframe(data):
 				
 				if(log):
 					print(str(packlen).rjust(4)+" ",end='')
+				
+				if(i >= len(data) or i+1 >= len(data)): # End-Of-File Error Checking, this works for all of RLE and the first two bytes of RAW
+					endoffile = True
+				
+				if(rle): # formerly: if((rle) and not (endoffile)):
+					# Two color bytes in LE order
+					b1 = data[i]
+					b2 = data[i+1]
 					
-				if(rle):
-						# Two color bytes in LE order
-						b1 = data[i]
-						b2 = data[i+1]
+					if(log):
+						printrgb(format(b2, '08b')+" "+format(b1, '08b'))
+					if(image):
+						# bytes to 5-bit and 8-bit RGB
+						r,g,b,ra,ga,ba = torgb(b2,b1)						
 						
-						if(log):
-							printrgb(format(b2, '08b')+" "+format(b1, '08b'))
-						if(image):
-							# bytes to 5-bit and 8-bit RGB
-							r,g,b,ra,ga,ba = torgb(b2,b1)
-							
-							for j in range(packlen):
-								if(pxnum < 96000): # End-Of-Pixels Error Checking
-									imgdat.append(ra)
-									imgdat.append(ga)
-									imgdat.append(ba)
-									pxnum = pxnum + 1
-									
-						# Skip past two color bytes
-						i = i + 2
+						for j in range(packlen):
+							if(pxnum < 96000): # End-Of-Pixels Error Checking
+								imgdat.append(ra)
+								imgdat.append(ga)
+								imgdat.append(ba)
+								pxnum = pxnum + 1
+								
+					# Skip past two color bytes
+					i = i + 2
 				else:
 					j = 0
 					while(j < packlen and not(endoffile)):
@@ -248,9 +250,13 @@ def processframe(data):
 								imgdat.append(ga)
 								imgdat.append(ba)
 								pxnum = pxnum + 1
-					
+						
 						# Next color pair
 						j = j + 1
+						if(i+j*2 >= len(data) or i+j*2+1 >= len(data)): # More Error Checking
+							#0/0 # exception
+							endoffile = True
+							print()
 					# Skip past raw color data
 					i = i + packlen*2
 				if(log):
@@ -259,26 +265,41 @@ def processframe(data):
 			
 			if(i < len(data) and pxnum >= 96000):
 				print("Warning: The file contains extra data past the end of the image.")
+			if pxnum < 96000:
+				#0/0 # Throw an exception (on purpose) to say we need more pixels. Let the except-block handle it.
+				endoffile = True
+				print()
+
+# We are done :)
+#       ^not quite :(
+
+# Result of Error Checking: Here is where we fill the rest of the space with black pixels.
 	
-		if pxnum < 96000:
-			0/0 # Throw an exception to say we need more pixels
-	
-	# We are done :)
-		#       ^not quite :(
+		if(endoffile):
+			print("Error: End of data has been reached. Now rendering black pixels...")
+			k = 0
+			while(pxnum < 96000):
+				imgdat.append(0x00)
+				imgdat.append(0x00)
+				imgdat.append(0x00)
+				k = k + 1
+				pxnum = pxnum + 1
+			print("Finished. Rendered "+str(k)+" black pixels.")
 		
-		# Result of Error Checking: Here is where we fill the rest of the space with black pixels.
+		return imgdat
 	
 	except:
-		print("Error: End of data has been reached. Now rendering black pixels...")
-		k = 0
-		while(pxnum < 96000):
-			imgdat.append(0x00)
-			imgdat.append(0x00)
-			imgdat.append(0x00)
-			k = k + 1
-			pxnum = pxnum + 1
-		print("Finished. Rendered "+str(k)+" black pixels.")
-	
+		print("Exception! Uh oh, stinky...")
+#		print("Error: End of data has been reached. Now rendering black pixels...")
+#		k = 0
+#		while(pxnum < 96000):
+#			imgdat.append(0x00)
+#			imgdat.append(0x00)
+#			imgdat.append(0x00)
+#			k = k + 1
+#			pxnum = pxnum + 1
+#		print("Finished. Rendered "+str(k)+" black pixels.")
+#	
 	return imgdat
 
 if(animated):
