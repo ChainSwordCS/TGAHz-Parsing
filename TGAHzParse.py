@@ -84,8 +84,6 @@ else:
 
 def processframe(data):
 
-	endoffile = False # Please don't remove or adjust this unless you KNOW it works. Throwing an exception instead of this may break things massively.
-
 	try: # better catch errors at end of data. obsoleted this -> endoffile = False
 		if(bit24): # Time for experimental 24-bit image support baby!!!
 			# Note: Don't skip any bytes (for now)
@@ -134,7 +132,7 @@ def processframe(data):
 							printrgb24hex(format(b1, '02x')+format(b2, '02x')+format(b3, '02x'))
 						else:
 							printrgb24(format(b1, '08b')+" "+format(b2, '08b')+" "+format(b3, '08b'))
-						
+					
 					if(image):
 						# Note: No need to convert to 24-bit... This is already 24-bit hopefully
 						
@@ -143,7 +141,7 @@ def processframe(data):
 							imgdat.append(b1)
 							imgdat.append(b2)
 							imgdat.append(b3)
-						
+					
 					# Skip past three color bytes
 					i = i + 3
 					
@@ -202,17 +200,16 @@ def processframe(data):
 					rle = False
 				# Length of packet, pixels for RLE or colors for RAW
 				packlen = header % 128 + 1
-				#pxnum = pxnum + packlen # Increment the pixel number
 				# Skip header byte
 				i = i + 1;
 				
 				if(log):
 					print(str(packlen).rjust(4)+" ",end='')
 				
-				if(i >= len(data) or i+1 >= len(data)): # End-Of-File Error Checking, this works for all of RLE and the first two bytes of RAW
-					endoffile = True
+# obsolete		if(i >= len(data) or i+1 >= len(data)): # End-Of-File Error Checking, this works for all of RLE and the first two bytes of RAW
+#					endoffile = True
 				
-				if(rle): # formerly: if((rle) and not (endoffile)):
+				if(rle):
 					# Two color bytes in LE order
 					b1 = data[i]
 					b2 = data[i+1]
@@ -234,7 +231,7 @@ def processframe(data):
 					i = i + 2
 				else:
 					j = 0
-					while(j < packlen and not(endoffile)):
+					while(j < packlen):
 						# Two color bytes in LE order
 						b1 = data[i+j*2]
 						b2 = data[i+j*2+1]
@@ -254,9 +251,8 @@ def processframe(data):
 						# Next color pair
 						j = j + 1
 						if(i+j*2 >= len(data) or i+j*2+1 >= len(data)): # More Error Checking
-							#0/0 # exception
-							endoffile = True
-							print()
+							0/0 # throw exception (on purpose lol)
+					
 					# Skip past raw color data
 					i = i + packlen*2
 				if(log):
@@ -266,41 +262,26 @@ def processframe(data):
 			if(i < len(data) and pxnum >= 96000):
 				print("Warning: The file contains extra data past the end of the image.")
 			if pxnum < 96000:
-				#0/0 # Throw an exception (on purpose) to say we need more pixels. Let the except-block handle it.
-				endoffile = True
-				print()
+				0/0 # Throw an exception (on purpose) to say we need more pixels. Let the except-block handle it.
 
 # We are done :)
 #       ^not quite :(
 
-# Result of Error Checking: Here is where we fill the rest of the space with black pixels.
-	
-		if(endoffile):
-			print("Error: End of data has been reached. Now rendering black pixels...")
-			k = 0
-			while(pxnum < 96000):
-				imgdat.append(0x00)
-				imgdat.append(0x00)
-				imgdat.append(0x00)
-				k = k + 1
-				pxnum = pxnum + 1
-			print("Finished. Rendered "+str(k)+" black pixels.")
-		
 		return imgdat
-	
+
+	# Result of Error Checking: Here is where we fill the rest of the space with black pixels.
 	except:
-		print("Exception! Uh oh, stinky...")
-#		print("Error: End of data has been reached. Now rendering black pixels...")
-#		k = 0
-#		while(pxnum < 96000):
-#			imgdat.append(0x00)
-#			imgdat.append(0x00)
-#			imgdat.append(0x00)
-#			k = k + 1
-#			pxnum = pxnum + 1
-#		print("Finished. Rendered "+str(k)+" black pixels.")
-#	
-	return imgdat
+		print()
+		print("Error: End of data has been reached. Now rendering black pixels...")
+		k = 0
+		while(pxnum < 96000):
+			imgdat.append(0x00)
+			imgdat.append(0x00)
+			imgdat.append(0x00)
+			k = k + 1
+			pxnum = pxnum + 1
+		print("Finished. Rendered "+str(k)+" black pixels.")
+		return imgdat
 
 if(animated):
 	frames = []
