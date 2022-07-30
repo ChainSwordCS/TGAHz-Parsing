@@ -14,33 +14,36 @@ This script is written in Python 3. It requires the 'pillow' module.
 
 This is not a generic TARGA reader. It is only designed to interpret HzMod TGAs, so certain header information is hard-coded as it is constant for HzMod.
 
-There are several available command-line arguments:
-
-* `-log`: Log each packet and some metadata to the console
-* `-logcolor`: Color-code log output as RGB, with purple for the attribute bit
-* `-loghex`: Log each packet, but in 24-bit hex color values rather than binary (Only compatible with 24-bit color decoding)
-
-* `-noimage`: Don't output an image
-
-* `-txt`: Take input from a text file containing a hex string on the first line
-* `-txtanim`: Create an animated image with input from a text file containing a hex string on each line
-* `-tga` or `-bin`: Take input from a binary file
-* `-hex`: Take input from a hex string
-
-* `-bit24`: Force experimental 24-bit color decoding (16-bit is the default)
-
 All input, raw or as a file, is at the end of the command. For example, `python TGAHzParse.py -txt -log input.txt` takes input as a hex string in input.txt.
 
 Output images are saved as TGAHZ.png for single frames or TGAHZ.gif for animations.
 
-# Key
+There are several available command-line arguments:
+
+* Input arguments
+  * `-txt`: Take input from a text file containing a hex string on the first line
+  * `-txtanim`: Create an animated image with input from a text file containing a hex string on each line
+  * `-tga` or `-bin`: Take input from a binary file
+  * `-hex`: Take input from a hex string
+
+* Experimental Features (Not finished, only had limited testing)
+  * `-bit24`: Force experimental 24-bit color decoding (16-bit is the default)
+
+* Debugging Tools
+  * `-log`: Log each packet and some metadata to the console
+  * `-logcolor`: Color-code log output as RGB, with purple for the attribute bit
+  * `-loghex`: Log each packet, but in 24-bit hex color values rather than binary (Only compatible with 24-bit color decoding)
+  * `--forcerenderhbytes`: Forcibly process and render the header byte of every RAW and RLE packet as a pixel in a shade of red. May be useful for visually debugging.
+  * `-noimage`: Don't output an image
+
+# Image Parsing Progress, Testing, and Results
+
+## Key
 
 * R = This bit is part of the Red
 * G = This bit is part of the Green
 * B = This bit is part of the Blue
 * A = This bit is the 'Attribute Bit'
-
-# Image Parsing Results
 
 ## Commit [139fa60](https://github.com/Eiim/TGAHz-Parsing/commit/139fa601fc96389fba8d3332ca6f058a16d84994)
 
@@ -92,6 +95,10 @@ https://cdn.discordapp.com/attachments/836413155894100050/837196767270666310/TGA
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837196767270666310/TGAHZ.png)
 
+# Samples From Other Games
+
+todo: document it (maybe)
+
 # 24-Bit Image Parsing Results
 
 ## Commit [625e0ff](https://github.com/ChainSwordCS/TGAHz-Parsing/commit/625e0fff53aff33e961fd9c828136614449d4522)
@@ -101,3 +108,5 @@ Preliminary support. Totally broken. With 16-bit we had a jump start, but here w
 https://cdn.discordapp.com/attachments/836413155894100050/837536941326729246/TGAHZ.png
 
 ![](https://cdn.discordapp.com/attachments/836413155894100050/837536941326729246/TGAHZ.png)
+
+Note to self: it's entirely possible that this is a misnomer. It may be transmitted and received as a 16bpp image.
