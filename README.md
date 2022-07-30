@@ -33,7 +33,7 @@ There are several available command-line arguments:
   * `-log`: Log each packet and some metadata to the console
   * `-logcolor`: Color-code log output as RGB, with purple for the attribute bit
   * `-loghex`: Log each packet, but in 24-bit hex color values rather than binary (Only compatible with 24-bit color decoding)
-  * `--forcerenderhbytes`: Forcibly process and render the header byte of every RAW and RLE packet as a pixel in a shade of red. May be useful for visually debugging.
+  * `-forcerenderhbytes`: Forcibly process and render the header byte of every RAW and RLE packet as a pixel in a shade of red. May be useful for visually debugging.
   * `-noimage`: Don't output an image
 
 # Image Parsing Progress, Testing, and Results
