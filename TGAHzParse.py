@@ -38,12 +38,15 @@ def printrgb24hex(rgb): # The Squeakquel
 def torgb(b2, b1):
 #	RRRRRGGG GGBBBBBA
 	r = int(b2/8)
-	g = (b2%8)*4 + int(b1/64)
-	b = int((b1%64)/2)
+	g = int((b2%8)*4 + int(b1/64))
+	b = int(int(b1/2)%32)
+	# Note. For some reason, with Super Mario 3D Land (and maybe other games) this byte receives bad data and must use the following formula instead:
+	#b = int(int((b1*8)%256)/8)
+	
 #	Convert to 24-bit color (simple algorithm)
-	ra = r*8+int(r/4)
-	ga = g*8+int(g/4)
-	ba = b*8+int(b/4)
+	ra = (r*8+int(r/4))%256
+	ga = (g*8+int(g/4))%256
+	ba = (b*8+int(b/4))%256
 
 	return(r,g,b,ra,ga,ba)
 	
@@ -95,7 +98,7 @@ def processframe(data):
 			if(image):
 				imgdat = bytearray(b'')
 				
-			while(i < len(data) and pxnum < 96000): #Will abruptly end after the final pixel :)
+			while(i < len(data) and pxnum < 96000): # Will abruptly end after the final pixel :)
 				header = data[i] # Top byte indicates RLE/RAW
 				
 				if(header > 127):
